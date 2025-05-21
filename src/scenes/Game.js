@@ -48,7 +48,7 @@ export class Game extends Phaser.Scene {
     update() 
     {
         if (this.cursors.left.isDown) {
-           this.player.moveLeft();
+            this.player.moveLeft();
         } else if (this.cursors.right.isDown) {
             this.player.moveRight();
         } else {
@@ -56,7 +56,7 @@ export class Game extends Phaser.Scene {
         }
 
         if (this.cursors.up.isDown) {
-           this.player.jump();
+            this.player.jump();
         }
     }
 
