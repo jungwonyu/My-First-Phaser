@@ -37,7 +37,11 @@ export class Game extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.stars, this.collectStar, null, this);
 
         this.score = 0;
-        this.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+        this.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' })
+        
+        // 최고 점수 로드
+        this.highScore = localStorage.getItem('highScore') || 0;
+        this.highScoreText = this.add.text(16, 48, 'High Score: ' + this.highScore, { fontSize: '24px', fill: '#000' });
 
         this.bombs = this.physics.add.group();
 
@@ -67,9 +71,15 @@ export class Game extends Phaser.Scene {
         this.score += 10;
         this.scoreText.setText('Score: ' + this.score);
 
+        // 최고 점수 갱신   
+        if (this.score > this.highScore) {
+            this.highScore = this.score;
+            localStorage.setItem('highScore', this.highScore);
+            this.highScoreText.setText('High Score: ' + this.highScore);
+        }
+
         if (this.stars.countActive(true) === 0) {
-            this.stars.children.iterate(function (child)
-            {
+            this.stars.children.iterate(function (child) {
                 child.enableBody(true, child.x, 0, true, true);
             });
 
