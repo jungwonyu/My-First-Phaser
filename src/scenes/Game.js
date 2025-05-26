@@ -3,10 +3,11 @@ import { Player } from '../gameObjects/Player.js';
 export class Game extends Phaser.Scene {
     constructor() {
         super('Game');
+        this.initialTime = 90;
+        this.remainingTime = this.initialTime;
     }
 
-    create() 
-    {
+    create() {
         this.add.image(400, 300, 'sky');
 
         this.platforms = this.physics.add.staticGroup();
@@ -39,18 +40,42 @@ export class Game extends Phaser.Scene {
         this.score = 0;
         this.scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' })
         
-        // 최고 점수 로드
-        this.highScore = localStorage.getItem('highScore') || 0;
+        this.highScore = localStorage.getItem('highScore') || 0;  // 최고 점수 로드
         this.highScoreText = this.add.text(16, 48, 'High Score: ' + this.highScore, { fontSize: '24px', fill: '#000' });
 
         this.bombs = this.physics.add.group();
 
+        this.level = 0;
+        this.levelText = this.add.text(16, 80, 'Level: ' + (this.level + 1), { fontSize: '24px', fill: '#000' });
+
         this.physics.add.collider(this.bombs, this.platforms);
         this.physics.add.collider(this.player, this.bombs, this.hitBomb, null, this);
+
+        this.initialTime = 90;
+        this.remainingTime = this.initialTime;
+        this.timerText = this.add.text(600, 16, 'Time: ' + this.initialTime, {
+            fontSize: '32px',
+            fill: '#000'
+        });
+        this.timerEvent = this.time.addEvent({
+            delay: 1000, // 1초마다
+            callback: this.onSecond,
+            callbackScope: this,
+            loop: true
+        });
     }
 
-    update() 
-    {
+    onSecond() {
+        this.remainingTime--;
+
+        this.timerText.setText('Time: ' + this.remainingTime);
+
+        if (this.remainingTime <= 0) {
+            this.endGame();
+        }
+    }
+
+    update() {
         if (this.cursors.left.isDown) {
             this.player.moveLeft();
         } else if (this.cursors.right.isDown) {
@@ -64,8 +89,7 @@ export class Game extends Phaser.Scene {
         }
     }
 
-    collectStar(player, star)
-    {
+    collectStar(player, star) {
         star.disableBody(true, true);
 
         this.score += 10;
@@ -88,15 +112,23 @@ export class Game extends Phaser.Scene {
     }
 
     hitBomb(player, bomb) {
-        this.physics.pause();
+        this.remainingTime = Math.max(this.remainingTime - 10, 0);
+        this.timerText.setText('Time: ' + this.remainingTime);
 
         player.setTint(0xff0000);
-
         player.anims.play('turn');
 
-        this.time.delayedCall(1000, () => {
-            this.scene.start('GameOver');
-        })
+        // 잠깐 멈췄다가 다시 정상화
+        this.physics.pause();
+
+        this.time.delayedCall(500, () => {
+            player.clearTint();
+            this.physics.resume();
+        });
+
+        if (this.remainingTime <= 0) {
+            this.endGame();
+        }
     }
 
     releaseBomb() {
@@ -106,5 +138,21 @@ export class Game extends Phaser.Scene {
         bomb.setBounce(1);
         bomb.setCollideWorldBounds(true);
         bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+
+        this.remainingTime = this.initialTime;
+        this.timerText.setText('Time: ' + this.remainingTime);
+
+        this.level++;
+        this.levelText.setText('Level: ' + (this.level + 1));
+    }
+
+    endGame() {
+        this.physics.pause();
+        this.player.setTint(0xff0000);
+        this.player.anims.play('turn');
+
+        this.time.delayedCall(1000, () => {
+            this.scene.start('GameOver');
+        });
     }
 }

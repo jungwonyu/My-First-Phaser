@@ -6,9 +6,8 @@ export class GameOver extends Phaser.Scene {
     create() {
         const gameScene = this.scene.get('Game');
         const finalScore = gameScene.score;
-
-        // 최고 점수 불러오기
-        const highScore = localStorage.getItem('highScore') || 0;
+        const highScore = localStorage.getItem('highScore') || 0; // 최고 점수 불러오기
+        const level = gameScene.level + 1; // 레벨은 0부터 시작하므로 +1
 
         this.cameras.main.setBackgroundColor(0xff0000);
         this.add.image(400, 250, 'background').setAlpha(0.5);
@@ -28,6 +27,13 @@ export class GameOver extends Phaser.Scene {
         // 최고 점수 표시
         this.add.text(400, 380, `High Score : ${highScore}`, {
             fontFamily: 'Arial Black', fontSize: 26, color: '#ffff00',
+            stroke: '#000000', strokeThickness: 4,
+            align: 'center'
+        }).setOrigin(0.5);
+
+        // 레벨 표시
+        this.add.text(400, 430, `Level : ${level}`, {
+            fontFamily: 'Arial Black', fontSize: 26, color: '#00ff00',
             stroke: '#000000', strokeThickness: 4,
             align: 'center'
         }).setOrigin(0.5);
