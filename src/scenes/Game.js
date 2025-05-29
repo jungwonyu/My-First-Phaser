@@ -48,7 +48,7 @@ export class Game extends Phaser.Scene {
     // --------------------------------------------------------------------- timer 생성(initialTime: 90 / 1초마다 event 실행)
     this.initialTime = 90;
     this.remainingTime = this.initialTime;
-    this.timerText = this.add.text(600, 16, 'Time: ' + this.initialTime, { fontSize: '32px', fill: '#000' });
+    this.timerText = this.add.text(600, 16, 'Time: ' + this.initialTime, { fontSize: '24px', fill: '#000' });
     this.timerEvent = this.time.addEvent({ delay: 1000, callback: this.onSecond, callbackScope: this, loop: true });
 
     // --------------------------------------------------------------------- 키보드 이벤트
